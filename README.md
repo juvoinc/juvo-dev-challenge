@@ -46,20 +46,6 @@ Ambos os projetos implementam um **Sistema de Blog** funcional com as seguintes 
 - Helmet (Segurança)
 - CORS
 
-## 📋 Como Usar
-
-1. **Escolha o projeto** baseado na tecnologia de interesse
-2. **Navegue até a pasta** correspondente (`/Csharp` ou `/Node`)
-3. **Siga as instruções** no README específico de cada projeto
-4. **Execute o projeto** e explore as funcionalidades
-
-## 📖 Documentação
-
-Cada projeto possui sua própria documentação detalhada:
-
-- **C#:** Consulte `/Csharp/README.md`
-- **Node.js:** Consulte `/Node/README.md`
-
 ## 🏁 Começando
 
 Para começar, escolha uma das tecnologias e siga as instruções específicas na pasta correspondente. Ambos os projetos são independentes e funcionais.

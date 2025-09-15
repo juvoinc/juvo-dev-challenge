@@ -2,7 +2,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  password: string; // ❌ PROBLEMA: Password em texto plano na interface
+  password: string;
   createdAt: Date;
   posts?: Post[];
   comments?: Comment[];
@@ -20,6 +20,5 @@ export interface UpdateUserRequest {
   password?: string;
 }
 
-// ❌ PROBLEMA: Importação circular potencial
 import { Post } from './Post';
 import { Comment } from './Comment';

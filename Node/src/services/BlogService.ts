@@ -12,7 +12,6 @@ export class BlogService {
     this.db = DatabaseConnection.getInstance().getDb();
   }
 
-  // ❌ PROBLEMA: N+1 Query Problem - busca dados relacionados em loops
   async getAllPosts(): Promise<Post[]> {
     return new Promise((resolve, reject) => {
       this.db.all('SELECT * FROM posts ORDER BY createdAt DESC', async (err, posts: any[]) => {
@@ -23,7 +22,6 @@ export class BlogService {
 
         const postsWithDetails: Post[] = [];
         
-        // ❌ PROBLEMA: Loop com queries individuais para cada post
         for (const post of posts) {
           const user = await this.getUserById(post.userId);
           const comments = await this.getCommentsByPostId(post.id);
@@ -44,7 +42,6 @@ export class BlogService {
     });
   }
 
-  // ❌ PROBLEMA: Método duplica lógica do getAllPosts
   async getPostById(id: number): Promise<Post | null> {
     return new Promise((resolve, reject) => {
       this.db.get('SELECT * FROM posts WHERE id = ?', [id], async (err, post: any) => {
@@ -58,7 +55,6 @@ export class BlogService {
           return;
         }
 
-        // ❌ PROBLEMA: Mesma lógica de N+1 queries
         const user = await this.getUserById(post.userId);
         const comments = await this.getCommentsByPostId(post.id);
         const tags = await this.getTagsByPostId(post.id);
@@ -75,7 +71,6 @@ export class BlogService {
     });
   }
 
-  // ❌ PROBLEMA: Não usa transações para operações relacionadas
   async createPost(postData: CreatePostRequest): Promise<Post> {
     return new Promise((resolve, reject) => {
       const { title, content, userId, tags = [] } = postData;
@@ -91,7 +86,6 @@ export class BlogService {
 
           const postId = this.lastID;
           
-          // ❌ PROBLEMA: Adiciona tags sem transação
           for (const tagName of tags) {
             await this.addTagToPost(postId, tagName);
           }
@@ -103,10 +97,8 @@ export class BlogService {
     });
   }
 
-  // ❌ PROBLEMA: Método privado que deveria ser otimizado
   private async addTagToPost(postId: number, tagName: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      // ❌ PROBLEMA: Verifica se tag existe com query separada
       this.db.get('SELECT id FROM tags WHERE name = ?', [tagName], (err, tag: any) => {
         if (err) {
           reject(err);
@@ -146,7 +138,6 @@ export class BlogService {
     });
   }
 
-  // ❌ PROBLEMA: Métodos auxiliares que fazem queries desnecessárias
   private async getUserById(userId: number): Promise<User | null> {
     return new Promise((resolve, reject) => {
       this.db.get('SELECT * FROM users WHERE id = ?', [userId], (err, user: any) => {
@@ -168,7 +159,6 @@ export class BlogService {
           return;
         }
 
-        // ❌ PROBLEMA: Mais N+1 queries para buscar usuários dos comentários
         const commentsWithUsers: Comment[] = [];
         for (const comment of comments) {
           const user = await this.getUserById(comment.userId);
@@ -203,13 +193,11 @@ export class BlogService {
     });
   }
 
-  // ❌ PROBLEMA: Busca ineficiente - carrega todos os posts na memória
   async getPostsByUser(userId: number): Promise<Post[]> {
     const allPosts = await this.getAllPosts();
     return allPosts.filter(post => post.userId === userId);
   }
 
-  // ❌ PROBLEMA: Search sem índices e carrega tudo na memória
   async searchPosts(searchTerm: string): Promise<Post[]> {
     const allPosts = await this.getAllPosts();
     return allPosts.filter(post => 

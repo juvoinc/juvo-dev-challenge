@@ -67,16 +67,7 @@ curl -X POST http://localhost:3000/api/posts \
 
 ### ⏱️ Tempo Sugerido
 - **15-20 minutos** para análise do código
-- **10 minutos** para discussão das descobertas
-
-### 📋 Foque Especialmente Em:
-- Performance e otimização de queries
-- Responsabilidades e separação de camadas
-- Padrões de design e boas práticas Node.js
-- Segurança e validações
-- Tratamento de erros e logging
-- Problemas de concorrência e singletons
-- Estrutura de projeto e organização
+- **5 minutos** para discussão das descobertas
 
 ### 🛠️ Tecnologias Utilizadas
 - **Node.js** com TypeScript

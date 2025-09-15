@@ -2,7 +2,6 @@ import DatabaseConnection from '../database/connection';
 import { Database } from 'sqlite3';
 import { Post } from '../models/Post';
 
-// ❌ PROBLEMA: Singleton mal implementado - vai criar problema de concorrência
 export class PostAnalyticsService {
   private static instance: PostAnalyticsService;
   private db: Database;
@@ -19,7 +18,6 @@ export class PostAnalyticsService {
     return PostAnalyticsService.instance;
   }
 
-  // ❌ PROBLEMA: Cache sem TTL e sem limite de tamanho
   async getPostMetrics(postId: number): Promise<any> {
     const cacheKey = `metrics_${postId}`;
     
@@ -58,14 +56,12 @@ export class PostAnalyticsService {
           analyzedAt: new Date()
         };
 
-        // ❌ PROBLEMA: Cache cresce indefinidamente
         this.cache.set(cacheKey, metrics);
         resolve(metrics);
       });
     });
   }
 
-  // ❌ PROBLEMA: Método síncrono que deveria ser assíncrono
   calculateEngagementScore(post: Post): number {
     const daysSinceCreation = (Date.now() - new Date(post.createdAt).getTime()) / (1000 * 60 * 60 * 24);
     const commentsPerDay = (post.comments?.length || 0) / (daysSinceCreation || 1);
@@ -74,7 +70,6 @@ export class PostAnalyticsService {
     return Math.round((commentsPerDay + tagsWeight) * 100) / 100;
   }
 
-  // ❌ PROBLEMA: Não limpa cache periodicamente
   clearCache(): void {
     this.cache.clear();
   }

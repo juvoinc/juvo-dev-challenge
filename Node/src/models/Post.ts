@@ -12,7 +12,7 @@ export interface Post {
   user?: User;
   comments?: Comment[];
   tags?: Tag[];
-  viewCount?: number; // ❌ PROBLEMA: Campo não persistido mas usado em lógica
+  viewCount?: number;
 }
 
 export interface CreatePostRequest {
@@ -28,7 +28,6 @@ export interface UpdatePostRequest {
   tags?: string[];
 }
 
-// ❌ PROBLEMA: Validação no model ao invés de validator dedicado
 export function validatePost(post: CreatePostRequest): string[] {
   const errors: string[] = [];
   

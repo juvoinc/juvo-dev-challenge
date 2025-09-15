@@ -15,12 +15,10 @@ export class PostsController {
     this.categorizationService = new PostCategorizationService();
   }
 
-  // ❌ PROBLEMA: Método faz muitas responsabilidades
   async getAllPosts(req: Request, res: Response): Promise<void> {
     try {
       const startTime = Date.now();
       
-      // ❌ PROBLEMA: Logging manual em arquivo
       const logEntry = {
         action: 'getAllPosts',
         timestamp: new Date().toISOString(),
@@ -34,14 +32,12 @@ export class PostsController {
 
       const posts = await this.blogService.getAllPosts();
       
-      // ❌ PROBLEMA: Lógica de negócio no controller
       const postsWithEngagement = posts.map(post => ({
         ...post,
         engagementScore: this.calculateEngagement(post),
         isPopular: (post.comments?.length || 0) > 2
       }));
 
-      // ❌ PROBLEMA: Filtragem de dados sensíveis no controller
       const sanitizedPosts = postsWithEngagement.map(post => ({
         ...post,
         user: post.user ? {
@@ -54,7 +50,6 @@ export class PostsController {
       const endTime = Date.now();
       const responseTime = endTime - startTime;
 
-      // ❌ PROBLEMA: Mais logging manual
       const responseLog = {
         action: 'getAllPosts_response',
         timestamp: new Date().toISOString(),
@@ -74,7 +69,6 @@ export class PostsController {
         }
       });
     } catch (error) {
-      // ❌ PROBLEMA: Tratamento de erro inadequado
       console.error('Error in getAllPosts:', error);
       
       const errorLog = {
@@ -95,12 +89,10 @@ export class PostsController {
     }
   }
 
-  // ❌ PROBLEMA: Duplicação de lógica de logging
   async getPostById(req: Request, res: Response): Promise<void> {
     try {
       const postId = parseInt(req.params.id);
       
-      // ❌ PROBLEMA: Validação manual no controller
       if (isNaN(postId) || postId <= 0) {
         return res.status(400).json({
           success: false,
@@ -130,10 +122,8 @@ export class PostsController {
         });
       }
 
-      // ❌ PROBLEMA: Incrementa view count no controller
       await this.incrementViewCount(postId);
 
-      // ❌ PROBLEMA: Lógica de negócio no controller
       const postWithDetails = {
         ...post,
         engagementScore: this.calculateEngagement(post),
@@ -154,12 +144,10 @@ export class PostsController {
     }
   }
 
-  // ❌ PROBLEMA: Método muito longo com muitas responsabilidades
   async createPost(req: Request, res: Response): Promise<void> {
     try {
       const { title, content, userId, tags } = req.body;
 
-      // ❌ PROBLEMA: Validação detalhada no controller
       const postData = { title, content, userId, tags };
       const validationErrors = validatePost(postData);
       
@@ -171,7 +159,6 @@ export class PostsController {
         });
       }
 
-      // ❌ PROBLEMA: Verificação de usuário no controller
       if (!(await this.userExists(userId))) {
         return res.status(400).json({
           success: false,
@@ -180,7 +167,6 @@ export class PostsController {
         });
       }
 
-      // ❌ PROBLEMA: Filtro de conteúdo inadequado no controller
       const profanityWords = ['badword1', 'badword2', 'inappropriate'];
       const containsProfanity = profanityWords.some(word =>
         title.toLowerCase().includes(word) || 
@@ -197,10 +183,8 @@ export class PostsController {
 
       const post = await this.blogService.createPost(postData);
 
-      // ❌ PROBLEMA: Envio de notificação no controller
       await this.sendNotificationEmail(userId, post.id);
 
-      // ❌ PROBLEMA: Logging manual novamente
       const logEntry = {
         action: 'createPost',
         postId: post.id,
@@ -281,7 +265,6 @@ export class PostsController {
     }
   }
 
-  // ❌ PROBLEMA: Métodos auxiliares que deveriam estar em services
   private calculateEngagement(post: any): number {
     const daysSinceCreation = (Date.now() - new Date(post.createdAt).getTime()) / (1000 * 60 * 60 * 24);
     const commentsPerDay = (post.comments?.length || 0) / (daysSinceCreation || 1);
@@ -299,7 +282,6 @@ export class PostsController {
   }
 
   private async userExists(userId: number): Promise<boolean> {
-    // ❌ PROBLEMA: Query direta no controller
     return new Promise((resolve) => {
       const db = require('../database/connection').default.getInstance().getDb();
       db.get('SELECT id FROM users WHERE id = ?', [userId], (err: any, user: any) => {
@@ -309,7 +291,6 @@ export class PostsController {
   }
 
   private async incrementViewCount(postId: number): Promise<void> {
-    // ❌ PROBLEMA: Gerenciamento de arquivos no controller
     const filePath = path.join(__dirname, `../../views_${postId}.txt`);
     let count = 0;
     
@@ -333,7 +314,6 @@ export class PostsController {
   }
 
   private async sendNotificationEmail(userId: number, postId: number): Promise<void> {
-    // ❌ PROBLEMA: Lógica de email no controller
     const db = require('../database/connection').default.getInstance().getDb();
     
     return new Promise((resolve) => {

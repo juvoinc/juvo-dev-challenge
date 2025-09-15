@@ -2,7 +2,6 @@ import sqlite3 from 'sqlite3';
 import { Database } from 'sqlite3';
 import path from 'path';
 
-// ❌ PROBLEMA: Singleton mal implementado - não thread-safe
 class DatabaseConnection {
   private static instance: DatabaseConnection;
   private db: Database;
@@ -10,7 +9,6 @@ class DatabaseConnection {
   private constructor() {
     const dbPath = path.join(__dirname, '../../blog.db');
     
-    // ❌ PROBLEMA: Não trata erros de conexão adequadamente
     this.db = new sqlite3.Database(dbPath, (err) => {
       if (err) {
         console.error('Error opening database:', err.message);
@@ -33,7 +31,6 @@ class DatabaseConnection {
     return this.db;
   }
 
-  // ❌ PROBLEMA: Inicialização síncrona de tabelas em construtor assíncrono
   private initializeTables(): void {
     const createTables = `
       CREATE TABLE IF NOT EXISTS users (
@@ -78,7 +75,6 @@ class DatabaseConnection {
       );
     `;
 
-    // ❌ PROBLEMA: Executa múltiplas queries sem controle de transação
     this.db.exec(createTables, (err) => {
       if (err) {
         console.error('Error creating tables:', err.message);
@@ -89,7 +85,6 @@ class DatabaseConnection {
     });
   }
 
-  // ❌ PROBLEMA: Seed sem verificar se dados já existem
   private seedDatabase(): void {
     const seedData = `
       INSERT OR IGNORE INTO users (name, email, password) VALUES
@@ -135,7 +130,6 @@ class DatabaseConnection {
     });
   }
 
-  // ❌ PROBLEMA: Método close sem cleanup adequado
   public close(): void {
     this.db.close();
   }
